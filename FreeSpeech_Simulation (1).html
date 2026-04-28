@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lit & Comp II · Georgia Milestones Practice Simulation</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f2a4a;
+  --navy-mid: #1a3a60;
+  --navy-light: #2a4a6a;
+  --blue: #1a4e8a;
+  --blue-soft: #dce8f5;
+  --blue-bright: #7ab0e8;
+  --cream: #f7f3ee;
+  --cream-dark: #ede7de;
+  --cream-border: #d8cfc5;
+  --ink: #1a1410;
+  --ink-soft: #4a403a;
+  --ink-faint: #8a7e78;
+  --gold: #c4960a;
+  --gold-soft: #fdf3d0;
+  --green: #1a6b3a;
+  --green-soft: #d4ecde;
+  --red: #8a1a1a;
+  --red-soft: #f5dcdc;
+  --teal: #1a6b6b;
+  --teal-soft: #d4ecea;
+  --orange: #c45a0a;
+  --orange-soft: #fde8d0;
+  --vocab-flag: #7b2fa0;
+  --vocab-soft: #f0e4f8;
+  --white: #ffffff;
+  --shadow: 0 2px 12px rgba(15,42,74,0.12);
+  --shadow-lg: 0 8px 32px rgba(15,42,74,0.18);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--ink); min-height: 100vh; }
+
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+
+/* REGISTRATION */
+#screen-register { background: var(--navy); padding: 40px 20px; }
+#screen-register.active { display: flex; align-items: center; justify-content: center; }
+.register-card { background: white; border-radius: 16px; padding: 48px 52px; max-width: 520px; width: 100%; box-shadow: var(--shadow-lg); }
+.register-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
+.register-logo-badge { width: 48px; height: 48px; background: var(--navy); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.register-logo-text { display: flex; flex-direction: column; }
+.register-logo-text .eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--blue); font-family: 'DM Mono', monospace; font-weight: 600; }
+.register-logo-text .brand { font-family: 'Libre Baskerville', serif; font-size: 1.1rem; font-weight: 700; color: var(--ink); line-height: 1.2; }
+.register-card h2 { font-family: 'Libre Baskerville', serif; font-size: 1.6rem; color: var(--navy); margin-bottom: 6px; }
+.register-card .subtitle { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 32px; line-height: 1.5; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-soft); font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+.form-group input, .form-group select { width: 100%; border: 1.5px solid var(--cream-border); border-radius: 8px; padding: 13px 16px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--ink); background: var(--cream); outline: none; transition: border-color 0.2s; }
+.form-group input:focus, .form-group select:focus { border-color: var(--blue); background: white; }
+.btn-start { width: 100%; background: var(--navy); color: white; border: none; border-radius: 10px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; letter-spacing: 0.3px; margin-top: 8px; }
+.btn-start:hover { background: var(--blue); }
+.btn-start:active { transform: scale(0.99); }
+.register-info { margin-top: 24px; background: var(--blue-soft); border-radius: 8px; padding: 14px 18px; font-size: 12.5px; color: var(--blue); line-height: 1.6; }
+.register-info strong { display: block; margin-bottom: 4px; }
+
+/* SIMULATION HEADER */
+#screen-sim { background: var(--cream); }
+.sim-header { background: var(--navy); color: white; padding: 0 32px; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--blue); }
+.sim-header-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; gap: 16px; }
+.sim-header-left { display: flex; align-items: center; gap: 16px; }
+.sim-brand { font-family: 'Libre Baskerville', serif; font-size: 1rem; font-weight: 700; color: var(--cream); }
+.sim-sub { font-size: 11px; color: #7ab0e8; font-family: 'DM Mono', monospace; letter-spacing: 1px; }
+.sim-student-pill { background: rgba(122,176,232,0.15); border: 1px solid rgba(122,176,232,0.3); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: #a0c4e8; font-weight: 500; }
+.sim-progress-bar-wrap { padding: 10px 0 14px; display: flex; align-items: center; gap: 14px; }
+.sim-progress-track { flex: 1; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+.sim-progress-fill { height: 100%; background: var(--blue-bright); border-radius: 10px; transition: width 0.4s ease; width: 0%; }
+.sim-progress-label { font-size: 11px; color: #7ab0e8; font-family: 'DM Mono', monospace; white-space: nowrap; min-width: 80px; text-align: right; }
+.sim-timer-save { display: flex; align-items: center; gap: 10px; }
+.timer-display { font-family: 'DM Mono', monospace; font-size: 13px; color: #7ab0e8; background: rgba(255,255,255,0.06); border: 1px solid rgba(122,176,232,0.2); border-radius: 6px; padding: 5px 12px; }
+.btn-save-later { background: transparent; border: 1px solid rgba(122,176,232,0.4); border-radius: 6px; padding: 6px 14px; font-size: 11.5px; color: #7ab0e8; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-save-later:hover { background: rgba(122,176,232,0.12); color: #c8dff5; }
+
+/* MAIN LAYOUT */
+.sim-main { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 110px); overflow: hidden; }
+.passage-panel { background: white; border-right: 2px solid var(--cream-border); overflow-y: auto; padding: 28px 32px 40px; height: 100%; }
+.passage-panel-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--blue); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.passage-panel-label::after { content: ''; flex: 1; height: 1px; background: var(--cream-border); }
+.question-panel { background: var(--cream); overflow-y: auto; padding: 28px 32px 40px; height: 100%; display: flex; flex-direction: column; }
+.question-panel-inner { flex: 1; }
+.qnav-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 0 0; border-top: 1px solid var(--cream-border); margin-top: 24px; flex-shrink: 0; }
+.qnav-btn { background: white; border: 1.5px solid var(--cream-border); border-radius: 8px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+.qnav-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
+.qnav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.qnav-btn.primary { background: var(--navy); border-color: var(--navy); color: white; }
+.qnav-btn.primary:hover:not(:disabled) { background: var(--blue); border-color: var(--blue); }
+.qnav-dots { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; justify-content: center; max-width: 320px; }
+.qnav-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--cream-border); cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; }
+.qnav-dot.answered { background: var(--blue); }
+.qnav-dot.flagged { background: var(--vocab-flag); }
+.qnav-dot.current { border-color: var(--navy); transform: scale(1.3); }
+.qnav-dot.writing-dot { background: var(--gold); border-radius: 3px; }
+
+@media (max-width: 760px) {
+  .sim-main { grid-template-columns: 1fr; height: auto; overflow: visible; }
+  .passage-panel { height: auto; border-right: none; border-bottom: 2px solid var(--cream-border); max-height: 50vh; overflow-y: auto; }
+  .question-panel { height: auto; }
+}
+
+/* PASSAGE BLOCKS */
+.passage-block { background: white; border: 1px solid var(--cream-border); border-radius: 10px; padding: 24px 28px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.passage-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink-faint); font-family: 'DM Mono', monospace; margin-bottom: 10px; font-weight: 600; }
+.passage-title { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.passage-meta { font-size: 12px; color: var(--ink-faint); font-style: italic; margin-bottom: 16px; }
+.passage-body { font-size: 14.5px; line-height: 1.75; color: var(--ink); }
+.para-wrap { display: flex; margin-bottom: 12px; }
+.para-wrap:last-child { margin-bottom: 0; }
+.para-num { display: inline-block; width: 22px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-faint); vertical-align: top; margin-top: 3px; margin-right: 4px; flex-shrink: 0; }
+.para-text { flex: 1; font-size: 14.5px; line-height: 1.75; }
+
+/* VIDEO BLOCK */
+.video-block { background: var(--navy); border-radius: 10px; padding: 16px 20px 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.video-block-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #7ab0e8; font-weight: 600; margin-bottom: 6px; }
+.video-block-title { font-family: 'Libre Baskerville', serif; font-size: 1rem; font-weight: 700; color: white; margin-bottom: 4px; }
+.video-block-meta { font-size: 12px; color: #a0c4e8; font-style: italic; margin-bottom: 14px; }
+.video-embed-wrap { position: relative; width: 100%; padding-top: 56.25%; border-radius: 8px; overflow: hidden; background: #000; }
+.video-embed-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 8px; }
+.video-note { font-size: 11.5px; color: #7ab0e8; margin-top: 10px; font-style: italic; }
+
+/* QUESTION CARDS */
+.question-card { background: white; border: 1px solid var(--cream-border); border-radius: 10px; margin-bottom: 16px; box-shadow: var(--shadow); overflow: hidden; transition: border-color 0.2s; }
+.question-card.answered { border-color: #b0d4b0; }
+.question-card.vocab-flagged { border-color: var(--vocab-flag); }
+.question-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--cream-border); gap: 12px; }
+.question-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.q-num { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; color: var(--blue); background: var(--blue-soft); border-radius: 4px; padding: 2px 8px; }
+.q-badge { font-size: 10px; font-weight: 600; border-radius: 4px; padding: 2px 7px; letter-spacing: 0.5px; text-transform: uppercase; font-family: 'DM Mono', monospace; }
+.q-badge-type { background: #ede8f5; color: #5a3a8a; }
+.q-badge-dok { background: var(--cream-dark); color: var(--ink-soft); }
+.q-badge-standard { background: var(--blue-soft); color: var(--blue); }
+.q-badge-answered { background: var(--green-soft); color: var(--green); }
+.q-badge-vocab { background: var(--vocab-soft); color: var(--vocab-flag); }
+.vocab-btn { display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--cream-border); border-radius: 6px; padding: 5px 10px; font-size: 11px; color: var(--ink-faint); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; }
+.vocab-btn:hover { border-color: var(--vocab-flag); color: var(--vocab-flag); }
+.vocab-btn.active { background: var(--vocab-soft); border-color: var(--vocab-flag); color: var(--vocab-flag); font-weight: 600; }
+.vocab-btn .flag-icon { font-size: 13px; }
+.question-body { padding: 16px 20px 20px; }
+.question-stem { font-size: 15px; line-height: 1.65; color: var(--ink); margin-bottom: 18px; }
+.question-stem strong { font-weight: 700; }
+
+/* SELECTED RESPONSE */
+.options-list { display: flex; flex-direction: column; gap: 8px; }
+.option-item { display: flex; align-items: flex-start; gap: 12px; padding: 11px 14px; border: 1.5px solid var(--cream-border); border-radius: 8px; cursor: pointer; transition: all 0.15s; background: white; }
+.option-item:hover { border-color: var(--blue); background: #f0f5ff; }
+.option-item.selected { border-color: var(--blue); background: var(--blue-soft); }
+.option-letter { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 600; color: var(--blue); background: var(--blue-soft); border-radius: 4px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.option-item.selected .option-letter { background: var(--blue); color: white; }
+.option-text { font-size: 14px; line-height: 1.55; color: var(--ink); padding-top: 2px; }
+
+/* MULTI-SELECT */
+.multi-select-hint { font-size: 12px; color: var(--ink-faint); font-style: italic; margin-bottom: 12px; }
+.multi-option .option-letter { background: var(--cream-dark); color: var(--ink-soft); border-radius: 4px; font-size: 11px; }
+.multi-option.selected { border-color: var(--teal); background: var(--teal-soft); }
+.multi-option.selected .option-letter { background: var(--teal); color: white; }
+.multi-option:hover { border-color: var(--teal); background: #f0f9f8; }
+
+/* DRAG AND DROP */
+.drag-instructions { font-size: 12px; color: var(--ink-faint); font-style: italic; margin-bottom: 14px; }
+.drag-zone-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
+@media (max-width: 600px) { .drag-zone-wrap { grid-template-columns: 1fr; } }
+.drag-zone { border: 2px dashed var(--cream-border); border-radius: 8px; min-height: 100px; padding: 12px; transition: border-color 0.2s, background 0.2s; }
+.drag-zone.drag-over { border-color: var(--blue); background: #f0f5ff; }
+.drag-zone-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-family: 'DM Mono', monospace; font-weight: 600; color: var(--ink-faint); margin-bottom: 10px; }
+.drag-bank { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--cream); border-radius: 8px; border: 1px solid var(--cream-border); min-height: 56px; }
+.drag-chip { background: white; border: 1.5px solid var(--cream-border); border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: grab; transition: all 0.15s; user-select: none; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.drag-chip:hover { border-color: var(--blue); box-shadow: 0 2px 8px rgba(26,78,138,0.15); }
+.drag-chip.dragging { opacity: 0.4; cursor: grabbing; }
+.drag-chip.placed { background: var(--blue-soft); border-color: var(--blue); }
+.drag-empty-hint { font-size: 11.5px; color: var(--ink-faint); font-style: italic; align-self: center; width: 100%; text-align: center; padding: 8px 0; }
+
+/* WRITING TASK */
+.writing-section-intro { background: var(--navy); border-radius: 12px; padding: 24px 28px; margin-bottom: 20px; color: white; }
+.writing-section-intro h3 { font-family: 'Libre Baskerville', serif; font-size: 1.1rem; margin-bottom: 8px; }
+.writing-section-intro p { font-size: 13.5px; line-height: 1.65; color: #a0c4e8; }
+.writing-checklist { background: var(--gold-soft); border: 1px solid #e8c840; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; }
+.writing-checklist h4 { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-family: 'DM Mono', monospace; font-weight: 600; color: var(--gold); margin-bottom: 10px; }
+.checklist-items { display: flex; flex-direction: column; gap: 6px; }
+.checklist-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; color: var(--ink-soft); cursor: pointer; }
+.checklist-item input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; accent-color: var(--gold); }
+.checklist-item.checked { color: var(--ink-faint); text-decoration: line-through; }
+.writing-scenario-block { background: var(--blue-soft); border: 1.5px solid var(--blue-bright); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+.writing-scenario-block .scenario-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--blue); font-weight: 600; margin-bottom: 8px; }
+.writing-scenario-block p { font-size: 14px; line-height: 1.65; color: var(--ink); }
+.writing-scenario-block p + p { margin-top: 10px; }
+.writing-scenario-block .research-q { font-family: 'Libre Baskerville', serif; font-style: italic; font-weight: 700; font-size: 1.05rem; color: var(--navy); margin: 14px 0 10px; }
+.writing-task-box { background: white; border: 1.5px solid #1a6b6b; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+.writing-task-box .task-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); font-weight: 600; margin-bottom: 8px; }
+.writing-task-box h3 { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; color: var(--navy); margin-bottom: 10px; }
+.writing-task-box p { font-size: 14px; line-height: 1.7; color: var(--ink); }
+.writing-task-box .task-purpose { margin-top: 12px; }
+.writing-task-box .task-purpose strong { color: var(--navy); }
+.writing-editor { background: white; border: 1.5px solid var(--cream-border); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+.editor-toolbar { background: var(--cream); border-bottom: 1px solid var(--cream-border); padding: 8px 16px; display: flex; align-items: center; gap: 6px; }
+.editor-toolbar-btn { background: white; border: 1px solid var(--cream-border); border-radius: 4px; padding: 4px 8px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--ink-soft); transition: all 0.1s; font-family: 'DM Sans', sans-serif; }
+.editor-toolbar-btn:hover { background: var(--cream-dark); color: var(--ink); }
+.editor-toolbar-sep { width: 1px; height: 20px; background: var(--cream-border); margin: 0 4px; }
+.writing-textarea { width: 100%; min-height: 340px; border: none; outline: none; resize: none; font-family: 'Libre Baskerville', serif; font-size: 15px; line-height: 1.8; color: var(--ink); padding: 20px 24px; background: white; }
+.writing-textarea::placeholder { color: var(--ink-faint); }
+.word-count-bar { background: var(--cream); border-top: 1px solid var(--cream-border); padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; }
+.word-count-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink-faint); }
+.word-count-hint { font-size: 11px; color: var(--ink-faint); font-style: italic; }
+
+/* RESULTS */
+#screen-results { background: var(--cream); min-height: 100vh; }
+.results-header { background: var(--navy); color: white; padding: 32px 40px; border-bottom: 3px solid var(--blue); }
+.results-header .eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #7ab0e8; font-family: 'DM Mono', monospace; font-weight: 600; margin-bottom: 8px; }
+.results-header h1 { font-family: 'Libre Baskerville', serif; font-size: 1.6rem; font-weight: 700; color: var(--cream); margin-bottom: 4px; }
+.results-header .student-line { font-size: 13px; color: #a0c4e8; }
+.results-main { max-width: 900px; margin: 0 auto; padding: 36px 24px 60px; }
+.score-hero { background: white; border: 1px solid var(--cream-border); border-radius: 14px; padding: 36px; text-align: center; box-shadow: var(--shadow-lg); margin-bottom: 28px; position: relative; overflow: hidden; }
+.score-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--blue) 0%, var(--blue-bright) 100%); }
+.score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--navy); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 4px 20px rgba(15,42,74,0.3); }
+.score-circle .score-num { font-family: 'Libre Baskerville', serif; font-size: 2.2rem; font-weight: 700; color: white; line-height: 1; }
+.score-circle .score-denom { font-size: 12px; color: #7ab0e8; font-family: 'DM Mono', monospace; }
+.achievement-badge { display: inline-block; padding: 6px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 10px; }
+.ach-beginning { background: var(--red-soft); color: var(--red); }
+.ach-developing { background: var(--orange-soft); color: var(--orange); }
+.ach-proficient { background: var(--green-soft); color: var(--green); }
+.ach-distinguished { background: var(--gold-soft); color: var(--gold); }
+.score-hero p { font-size: 14px; color: var(--ink-soft); }
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+@media (max-width: 660px) { .results-grid { grid-template-columns: 1fr; } }
+.results-card { background: white; border: 1px solid var(--cream-border); border-radius: 12px; padding: 24px; box-shadow: var(--shadow); }
+.results-card.full-width { grid-column: 1 / -1; }
+.results-card-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-family: 'DM Mono', monospace; font-weight: 600; color: var(--blue); margin-bottom: 14px; }
+.domain-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.domain-row:last-child { margin-bottom: 0; }
+.domain-name { font-size: 13px; font-weight: 500; color: var(--ink); min-width: 120px; }
+.domain-bar-wrap { flex: 1; height: 8px; background: var(--cream-dark); border-radius: 10px; overflow: hidden; }
+.domain-bar-fill { height: 100%; background: var(--blue); border-radius: 10px; transition: width 1s ease; }
+.domain-score-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink-soft); min-width: 40px; text-align: right; }
+.ai-feedback-loading { text-align: center; padding: 32px; color: var(--ink-faint); font-size: 14px; }
+.ai-spinner { width: 32px; height: 32px; border: 3px solid var(--cream-border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.feedback-section { margin-bottom: 20px; }
+.feedback-section:last-child { margin-bottom: 0; }
+.feedback-section-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-family: 'DM Mono', monospace; font-weight: 600; margin-bottom: 8px; }
+.feedback-section-label.strengths { color: var(--green); }
+.feedback-section-label.next-steps { color: var(--orange); }
+.feedback-section-label.overall { color: var(--blue); }
+.feedback-section-label.teacher { color: var(--vocab-flag); }
+.feedback-text { font-size: 14px; line-height: 1.7; color: var(--ink); background: var(--cream); border-radius: 8px; padding: 14px 16px; }
+.trait-scores-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.trait-score-box { background: var(--cream); border-radius: 8px; padding: 12px; text-align: center; }
+.trait-score-box .trait-num { font-family: 'Libre Baskerville', serif; font-size: 1.5rem; font-weight: 700; color: var(--navy); }
+.trait-score-box .trait-denom { font-size: 11px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.trait-score-box .trait-label { font-size: 11px; color: var(--ink-soft); margin-top: 4px; line-height: 1.3; }
+.vocab-flags-list { display: flex; flex-direction: column; gap: 8px; }
+.vocab-flag-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink); background: var(--vocab-soft); border-radius: 6px; padding: 8px 12px; }
+.no-flags { font-size: 13.5px; color: var(--ink-faint); font-style: italic; text-align: center; padding: 16px; }
+.submission-confirm { background: var(--green-soft); border: 1px solid #80c880; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--green); margin-top: 20px; text-align: center; }
+
+/* OVERLAYS & UTILITY */
+.loading-overlay { display: none; position: fixed; inset: 0; background: rgba(15,42,74,0.7); z-index: 1000; align-items: center; justify-content: center; }
+.loading-overlay.active { display: flex; }
+.loading-box { background: white; border-radius: 14px; padding: 40px 48px; text-align: center; max-width: 360px; width: 90%; }
+.loading-box h3 { font-family: 'Libre Baskerville', serif; font-size: 1.1rem; color: var(--navy); margin-bottom: 8px; }
+.loading-box p { font-size: 13px; color: var(--ink-soft); }
+.loading-dots { font-size: 24px; color: var(--blue); letter-spacing: 6px; animation: dotPulse 1.4s ease-in-out infinite; display: block; margin: 16px 0; }
+@keyframes dotPulse { 0%,80%,100%{opacity:0.3} 40%{opacity:1} }
+.save-banner { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; border-radius: 10px; padding: 14px 20px; font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-lg); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; z-index: 500; }
+.save-banner.show { opacity: 1; transform: translateY(0); }
+.save-banner .banner-icon { font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <span class="loading-dots">• • •</span>
+    <h3 id="loadingTitle">Submitting your work...</h3>
+    <p id="loadingMsg">Please wait while we save your responses and generate AI writing feedback.</p>
+  </div>
+</div>
+
+<div class="save-banner" id="saveBanner">
+  <span class="banner-icon">💾</span>
+  <span id="saveBannerMsg">Progress saved. Resume anytime.</span>
+</div>
+
+<!-- SCREEN 1: REGISTRATION -->
+<div class="screen active" id="screen-register">
+  <div class="register-card">
+    <div class="register-logo">
+      <div class="register-logo-badge">🗣️</div>
+      <div class="register-logo-text">
+        <span class="eyebrow">McIntosh County Schools</span>
+        <span class="brand">Lit & Comp II Practice</span>
+      </div>
+    </div>
+    <h2>Before You Begin</h2>
+    <p class="subtitle">This simulation mirrors the Georgia Milestones Lit & Comp II assessment. Enter your information to get started.</p>
+    <div class="form-group">
+      <label for="studentName">Your Full Name</label>
+      <input type="text" id="studentName" placeholder="First Last" autocomplete="name" />
+    </div>
+    <div class="form-group">
+      <label for="studentBlock">Class Block</label>
+      <select id="studentBlock">
+        <option value="">-- Select your block --</option>
+        <option value="1">Block 1</option>
+        <option value="2">Block 2</option>
+        <option value="3">Block 3</option>
+        <option value="4">Block 4</option>
+      </select>
+    </div>
+    <button class="btn-start" onclick="startSim()">Begin Simulation →</button>
+    <div class="register-info">
+      <strong>What to expect:</strong>
+      Selected response · Multi-select · Drag-and-drop · Extended writing task · ~50–60 min · AI writing feedback upon submission
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: SIMULATION -->
+<div class="screen" id="screen-sim">
+  <header class="sim-header">
+    <div class="sim-header-top">
+      <div class="sim-header-left">
+        <div>
+          <div class="sim-brand">Lit & Comp II · Georgia Milestones Practice</div>
+          <div class="sim-sub">McIntosh County Schools · 2025–2026</div>
+        </div>
+        <div class="sim-student-pill" id="simStudentPill">Student</div>
+      </div>
+      <div class="sim-timer-save">
+        <div class="timer-display" id="timerDisplay">00:00</div>
+        <button class="btn-save-later" onclick="saveProgress()">💾 Save &amp; Resume Later</button>
+      </div>
+    </div>
+    <div class="sim-progress-bar-wrap">
+      <div class="sim-progress-track"><div class="sim-progress-fill" id="progressFill"></div></div>
+      <div class="sim-progress-label" id="progressLabel">0 / 19 answered</div>
+    </div>
+  </header>
+  <div class="sim-main" id="simMain"></div>
+</div>
+
+<!-- SCREEN 3: RESULTS -->
+<div class="screen" id="screen-results">
+  <div class="results-header">
+    <div class="eyebrow">Georgia Milestones Practice · Lit &amp; Comp II</div>
+    <h1>Your Simulation Results</h1>
+    <div class="student-line" id="resultsStudentLine">Loading...</div>
+  </div>
+  <div class="results-main">
+    <div class="score-hero">
+      <div class="score-circle">
+        <div class="score-num" id="heroScore">--</div>
+        <div class="score-denom" id="heroDenom">/ --</div>
+      </div>
+      <div class="achievement-badge" id="achievementBadge">Loading...</div>
+      <p id="achievementDesc">Calculating your achievement level...</p>
+    </div>
+    <div class="results-grid">
+      <div class="results-card">
+        <div class="results-card-label">Domain Breakdown</div>
+        <div id="domainBreakdown">Loading...</div>
+      </div>
+      <div class="results-card">
+        <div class="results-card-label">🚩 Vocabulary Flags</div>
+        <div id="vocabFlagsSummary">Loading...</div>
+      </div>
+      <div class="results-card">
+        <div class="results-card-label">Writing Rubric — Trait Scores</div>
+        <div class="trait-scores-row" id="traitScoresRow">
+          <div class="trait-score-box"><div class="trait-num" id="trait1Score">--</div><div class="trait-denom">/3</div><div class="trait-label">Purpose &amp; Organization</div></div>
+          <div class="trait-score-box"><div class="trait-num" id="trait2Score">--</div><div class="trait-denom">/3</div><div class="trait-label">Evidence &amp; Elaboration</div></div>
+          <div class="trait-score-box"><div class="trait-num" id="trait3Score">--</div><div class="trait-denom">/2</div><div class="trait-label">Language &amp; Conventions</div></div>
+        </div>
+        <p style="font-size:12px;color:var(--ink-faint);font-style:italic;">Scores generated by AI based on your extended response.</p>
+      </div>
+      <div class="results-card">
+        <div class="results-card-label">Quick Stats</div>
+        <div id="quickStats">Loading...</div>
+      </div>
+      <div class="results-card full-width">
+        <div class="results-card-label">AI Writing Feedback</div>
+        <div id="aiFeedbackArea">
+          <div class="ai-feedback-loading"><div class="ai-spinner"></div>Generating personalized feedback on your extended writing...</div>
+        </div>
+      </div>
+    </div>
+    <div id="submissionConfirm"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const WORKER_URL  = 'https://anthropic-proxy.arosenbaum.workers.dev/';
+const SHEETS_URL  = 'https://script.google.com/macros/s/AKfycbzdbJVQ1m40qTFbx3onQYAdT_tb4ROPoqcUOOb-bT7nBHgi5tGSNicmtPUBZQvHGisE/exec';
+const VIDEO_EMBED = 'https://drive.google.com/file/d/1wJpgXRw4UyCh6KCxDpigCKCa9uyJt97t/preview';
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let studentName = '', studentBlock = '';
+let timerInterval = null, elapsedSeconds = 0;
+let answers = {}, vocabFlags = {}, dragStates = {};
+let writingText = '';
+
+// ═══════════════════════════════════════
+// QUESTION & PASSAGE DATA
+// ═══════════════════════════════════════
+const QUESTIONS = [
+
+  // ── PASSAGE SET 1 (Q1–Q5): Text A — FOR limits on speech
+  {
+    id: 'p1', type: 'passage',
+    label: 'TEXT A — Read the following argument. Answer questions 1–5.',
+    title: 'The Boundaries of Expression: Why Some Speech Demands a Response',
+    meta: 'Adapted from a civic commentary, 2024',
+    paragraphs: [
+      'The First Amendment was never intended to function as a shield for every utterance at every moment. Its framers understood that rights exist within communities, and that communities depend on a measure of trust, safety, and shared dignity to function. When speech systematically dismantles the conditions that allow vulnerable groups to participate in public life, the invocation of freedom becomes a paradox: the speech of some eliminates the freedom of others.',
+      'Proponents of absolute free expression often cite the "marketplace of ideas"—the belief that open competition between arguments will naturally elevate truth over falsehood. This model, however, assumes equal standing among all participants. In practice, coordinated harassment campaigns, targeted disinformation, and the amplification of dehumanizing rhetoric do not compete fairly with measured counterarguments. The marketplace, when flooded with bad-faith actors, does not self-correct; it collapses.',
+      'Critics of speech regulation routinely warn of a slippery slope: if we restrict hate speech today, what prevents the government from silencing legitimate dissent tomorrow? This concern, while not frivolous, mistakes a spectrum for a binary. Democratic societies have long distinguished between content-neutral time-place-and-manner restrictions and viewpoint-based suppression. The legal and moral difference between a noise ordinance and a thought-crimes tribunal is not a matter of degree—it is a matter of kind.',
+      'What is at stake is not merely comfort or offense but the architecture of democratic participation itself. When entire communities are driven from public forums by coordinated intimidation, the democratic ideal of equal voice becomes fiction. Reasonable limits on demonstrably harmful speech are not a retreat from democratic values—they are their defense.',
+    ]
+  },
+
+  {
+    id: 'q1', passage: 'p1', type: 'selected',
+    stem: 'The author\'s central claim in Text A is best stated as which of the following?',
+    dok: 2, standard: '10.T.T.4', domain: 'techniques', points: 1,
+    options: [
+      { letter: 'A', text: 'The First Amendment should be repealed and replaced with more modern legislation.' },
+      { letter: 'B', text: 'Some limits on speech are necessary to protect the conditions that make democratic participation possible for all people.' },
+      { letter: 'C', text: 'The government has historically done an adequate job of regulating harmful speech.' },
+      { letter: 'D', text: 'Social media companies are the primary cause of the collapse of productive public debate.' },
+    ],
+    correct: 'B'
+  },
+
+  {
+    id: 'q2', passage: 'p1', type: 'selected',
+    stem: 'In paragraph 2, the author\'s use of the phrase "the marketplace, when flooded with bad-faith actors, does not self-correct; it collapses" primarily serves to—',
+    dok: 3, standard: '10.T.T.2', domain: 'techniques', points: 1,
+    options: [
+      { letter: 'A', text: 'introduce a new metaphor to replace the marketplace of ideas concept entirely' },
+      { letter: 'B', text: 'concede that free expression sometimes produces positive outcomes' },
+      { letter: 'C', text: 'undermine a commonly cited argument for unrestricted speech by identifying a flaw in its core assumption' },
+      { letter: 'D', text: 'compare economic markets to government censorship bureaus' },
+    ],
+    correct: 'C'
+  },
+
+  {
+    id: 'q3', passage: 'p1', type: 'selected',
+    stem: 'The author addresses the "slippery slope" counterargument in paragraph 3 primarily by—',
+    dok: 3, standard: '10.T.SS.2', domain: 'structure', points: 1,
+    options: [
+      { letter: 'A', text: 'dismissing the concern as uninformed and not worthy of serious consideration' },
+      { letter: 'B', text: 'arguing that the concern is valid and therefore no speech restrictions should be enacted' },
+      { letter: 'C', text: 'acknowledging the concern but drawing a distinction between types of speech restriction that undermines the slope analogy' },
+      { letter: 'D', text: 'citing historical examples of governments that successfully avoided censorship abuses' },
+    ],
+    correct: 'C'
+  },
+
+  {
+    id: 'q4', passage: 'p1', type: 'multiselect',
+    stem: 'Select <strong>two</strong> rhetorical strategies the author of Text A uses to build the argument.',
+    dok: 3, standard: '10.T.T.1', domain: 'techniques', points: 2,
+    selectCount: 2,
+    options: [
+      { letter: 'A', text: 'Anticipating and rebutting counterarguments to strengthen the author\'s own position' },
+      { letter: 'B', text: 'Using personal anecdote to establish emotional credibility with the reader' },
+      { letter: 'C', text: 'Reframing free speech not as an individual right but as a structural condition of democracy' },
+      { letter: 'D', text: 'Citing specific Supreme Court cases to provide legal authority' },
+      { letter: 'E', text: 'Using loaded language to create fear of the opposing viewpoint' },
+    ],
+    correct: ['A', 'C']
+  },
+
+  {
+    id: 'q5', passage: 'p1', type: 'selected',
+    stem: 'The word "architecture" in paragraph 4 ("the architecture of democratic participation") is used to suggest that democratic participation—',
+    dok: 2, standard: '10.L.V.3', domain: 'language', points: 1,
+    options: [
+      { letter: 'A', text: 'is a physical space that can be entered or exited' },
+      { letter: 'B', text: 'requires financial investment from municipal governments' },
+      { letter: 'C', text: 'is a designed, structural system that can be damaged or destroyed' },
+      { letter: 'D', text: 'is an aesthetic concept without practical consequences' },
+    ],
+    correct: 'C'
+  },
+
+  // ── VIDEO source (referenced in Q6–Q10)
+  {
+    id: 'vid1', type: 'video',
+    label: 'VIDEO SOURCE — Watch the video. Answer questions 6–10.',
+    title: 'Speech for Me, Not for Thee',
+    meta: 'View the full video before answering the questions in this section.'
+  },
+
+  // ── PASSAGE SET 2 (Q6–Q10): Text B — AGAINST limits, + video cross-reference
+  {
+    id: 'p2', type: 'passage',
+    label: 'TEXT B — Read the following argument. Answer questions 6–10 using Text B and the video.',
+    title: 'The Cure Worse Than the Disease: Against Speech Regulation',
+    meta: 'Adapted from a civil liberties journal, 2023',
+    paragraphs: [
+      'Every generation believes its moment is uniquely dangerous—that this time, the speech in question is so harmful, so unprecedented, that ordinary protections cannot apply. Every generation is wrong. The history of speech restriction in the United States is not a history of governments thoughtfully excising genuine threats; it is a history of the powerful silencing the inconvenient. Abolitionists, labor organizers, civil rights demonstrators, and anti-war protesters have all, at various times, been the targets of legal suppression justified in the language of public safety.',
+      'The foundational problem with hate speech laws and similar regulations is not that they are impractical—though they often are—but that they are philosophically incoherent. Speech is restricted based on its content, which requires the government to act as arbiter of acceptable ideas. Once that authority is established, its scope is determined not by principle but by power. Whoever controls the regulatory apparatus controls the boundary of permissible thought.',
+      'Advocates of speech limits argue that some expression causes measurable harm—that targeted harassment, for instance, creates conditions of fear that effectively silence its victims. This is true, and it is not trivial. But the remedy of government restriction carries its own silencing effects, broader and more durable than the harms it purports to address. A university that bans offensive speakers does not protect its students from disagreement; it makes them less prepared to encounter and defeat it.',
+      'The answer to bad speech is, as it has always been, more speech. Counter-argument, exposure, social accountability, and the patient work of persuasion have consistently proven more effective—and far less dangerous—than state power as a corrective for harmful ideas. A free society is not one in which no one is offended; it is one in which offense can always be answered.',
+    ]
+  },
+
+  {
+    id: 'q6', passage: 'p2', type: 'selected',
+    stem: 'The author of Text B opens with the claim that "every generation believes its moment is uniquely dangerous." The primary purpose of this opening is to—',
+    dok: 3, standard: '10.T.T.4', domain: 'techniques', points: 1,
+    options: [
+      { letter: 'A', text: 'establish that dangerous speech has never actually existed in American history' },
+      { letter: 'B', text: 'suggest that concerns about harmful speech are a recurring pattern rather than a new or special circumstance, undermining the urgency behind calls for regulation' },
+      { letter: 'C', text: 'praise the historical courage of Americans who supported free speech' },
+      { letter: 'D', text: 'argue that today\'s speech environment is less dangerous than in previous eras' },
+    ],
+    correct: 'B'
+  },
+
+  {
+    id: 'q7', passage: 'p2', type: 'selected',
+    stem: 'Both Text A and Text B acknowledge that targeted harassment can silence its victims. How do the two authors differ in their response to this shared acknowledgment?',
+    dok: 3, standard: '10.T.RA.1', domain: 'research', points: 1,
+    options: [
+      { letter: 'A', text: 'Text A uses this acknowledgment to argue for legal limits on speech; Text B uses it to argue that social accountability is a more effective and less dangerous remedy' },
+      { letter: 'B', text: 'Text A denies that harassment causes real harm; Text B argues that harassment is not speech' },
+      { letter: 'C', text: 'Both authors ultimately agree that government intervention is the appropriate response' },
+      { letter: 'D', text: 'Text B uses the acknowledgment to concede defeat in the argument' },
+    ],
+    correct: 'A'
+  },
+
+  {
+    id: 'q8', passage: 'p2', type: 'multiselect',
+    stem: 'Select <strong>two</strong> claims from Text B that are most directly supported by the argument made in the video <em>Speech for Me, Not for Thee</em>.',
+    dok: 3, standard: '10.T.RA.2', domain: 'research', points: 2,
+    selectCount: 2,
+    options: [
+      { letter: 'A', text: 'Speech restrictions have historically been used against the very groups they claimed to protect' },
+      { letter: 'B', text: 'The government is the most reliable arbiter of acceptable public discourse' },
+      { letter: 'C', text: 'Those who advocate for speech limits often apply them selectively based on whose speech is being restricted' },
+      { letter: 'D', text: 'University speech codes have been uniformly effective at reducing campus harassment' },
+      { letter: 'E', text: 'The authority to restrict speech tends to expand beyond its original intended scope' },
+    ],
+    correct: ['A', 'C', 'E']
+  },
+
+  {
+    id: 'q9', passage: 'p2', type: 'selected',
+    stem: 'In paragraph 3, the author of Text B writes that government restriction "carries its own silencing effects, broader and more durable than the harms it purports to address." This claim is an example of which argumentative move?',
+    dok: 3, standard: '10.T.SS.2', domain: 'structure', points: 1,
+    options: [
+      { letter: 'A', text: 'A straw man — misrepresenting the opposing argument to make it easier to refute' },
+      { letter: 'B', text: 'A concession-rebuttal — acknowledging the opponent\'s point but arguing the proposed solution creates a worse problem' },
+      { letter: 'C', text: 'An appeal to authority — citing a credible expert to validate the claim' },
+      { letter: 'D', text: 'A false dilemma — reducing a complex issue to only two possible positions' },
+    ],
+    correct: 'B'
+  },
+
+  {
+    id: 'q10', passage: 'p2', type: 'selected',
+    stem: 'The Latin root <em>arb-</em> (as in "arbiter," paragraph 2 of Text B) means "judge" or "one who decides." Based on this root and context, what does the author mean when they warn against the government acting as "arbiter of acceptable ideas"?',
+    dok: 2, standard: '10.L.V.2', domain: 'language', points: 1,
+    options: [
+      { letter: 'A', text: 'The government should appoint a neutral panel of citizens to evaluate speech cases' },
+      { letter: 'B', text: 'Giving government the power to decide which ideas are acceptable is dangerous because it places the authority to define permissible thought in political hands' },
+      { letter: 'C', text: 'The court system is better equipped than legislatures to handle speech disputes' },
+      { letter: 'D', text: 'The government has historically been too reluctant to regulate harmful expression' },
+    ],
+    correct: 'B'
+  },
+
+  // ── SECTION 3: Drag-and-drop + isolated SR (Q11–Q15)
+  {
+    id: 'q11', type: 'dragdrop',
+    stem: 'Drag each statement to the correct column: <strong>Claim</strong> (an arguable position requiring support) or <strong>Evidence</strong> (a fact or example used to support a position).',
+    dok: 2, standard: '10.T.SS.1', domain: 'structure', points: 2,
+    zone1Label: 'CLAIM',
+    zone2Label: 'EVIDENCE',
+    chips: [
+      { id: 'dc1', text: 'Speech restrictions have historically targeted labor organizers and civil rights activists.' },
+      { id: 'dc2', text: 'Reasonable limits on harmful speech defend rather than undermine democratic values.' },
+      { id: 'dc3', text: 'The First Amendment was ratified in 1791 as part of the Bill of Rights.' },
+      { id: 'dc4', text: 'Government restriction of speech silences more broadly than the harms it claims to address.' },
+      { id: 'dc5', text: 'The marketplace of ideas model assumes equal standing among all participants.' },
+      { id: 'dc6', text: 'Counter-argument and social accountability are more effective remedies than state power.' },
+    ],
+    correctZone1: ['dc2', 'dc4', 'dc6'],
+    correctZone2: ['dc1', 'dc3', 'dc5']
+  },
+
+  {
+    id: 'q12', type: 'selected',
+    stem: 'A student writes the following thesis: "Text A and Text B disagree about free speech." Which revision most accurately reflects the nature of the texts\' disagreement at a Proficient level of analysis?',
+    dok: 3, standard: '10.T.RA.2', domain: 'research', points: 1,
+    options: [
+      { letter: 'A', text: '"Text A supports Democrats and Text B supports Republicans on the issue of free speech."' },
+      { letter: 'B', text: '"While both texts acknowledge that harmful speech can silence victims, they differ fundamentally on whether government restriction or social counter-speech is the appropriate remedy—and on which poses the greater long-term threat to democratic participation."' },
+      { letter: 'C', text: '"Text A was written more recently than Text B, which explains their different conclusions."' },
+      { letter: 'D', text: '"The two texts disagree because their authors have different jobs."' },
+    ],
+    correct: 'B'
+  },
+
+  {
+    id: 'q13', type: 'selected',
+    stem: 'Which sentence uses a subordinate clause correctly to express a concessive relationship (acknowledging one thing while asserting another)?',
+    dok: 2, standard: '10.L.GC.2', domain: 'language', points: 1,
+    options: [
+      { letter: 'A', text: '"Free speech is important. Harmful speech exists."' },
+      { letter: 'B', text: '"Although targeted harassment can silence its victims, government restriction may create broader silencing effects."' },
+      { letter: 'C', text: '"Free speech or government restriction: one must be chosen."' },
+      { letter: 'D', text: '"The government restricts speech and people disagree."' },
+    ],
+    correct: 'B'
+  },
+
+  {
+    id: 'q14', type: 'selected',
+    stem: 'The video <em>Speech for Me, Not for Thee</em> and Text B share a common argumentative strategy. Which of the following best describes it?',
+    dok: 3, standard: '10.T.C.2', domain: 'context', points: 1,
+    options: [
+      { letter: 'A', text: 'Both use personal narrative to create emotional appeal' },
+      { letter: 'B', text: 'Both rely primarily on statistical data to build their case' },
+      { letter: 'C', text: 'Both use historical examples of speech restriction to argue that the power to limit speech tends to be turned against the groups least able to resist it' },
+      { letter: 'D', text: 'Both argue that the First Amendment should be amended to reflect modern conditions' },
+    ],
+    correct: 'C'
+  },
+
+  {
+    id: 'q15', type: 'dragdrop',
+    stem: 'Arrange the following steps of an effective <strong>concession-rebuttal</strong> structure in the correct order. Drag from the bank into the Correct Sequence zone.',
+    dok: 2, standard: '10.T.SS.1', domain: 'structure', points: 2,
+    zone1Label: 'CORRECT SEQUENCE (first → last)',
+    zone2Label: 'WORD BANK',
+    chips: [
+      { id: 'seq1', text: 'Acknowledge the opposing viewpoint fairly' },
+      { id: 'seq2', text: 'Signal the concession ("While it is true that...")' },
+      { id: 'seq3', text: 'State the limitation or problem with the conceded point' },
+      { id: 'seq4', text: 'Reassert your own claim in light of that limitation' },
+      { id: 'seq5', text: 'Provide evidence that supports your reasserted claim' },
+    ],
+    correctZone1: ['seq2', 'seq1', 'seq3', 'seq4', 'seq5'],
+    correctZone2: []
+  },
+
+  // ── SECTION 4: Periods/Movements + Language (Q16–Q19)
+  {
+    id: 'q16', type: 'selected',
+    stem: 'An author writing from an Enlightenment perspective would most likely differ from an author writing from a Romantic perspective on the topic of free speech in which of the following ways?',
+    dok: 2, standard: '10.T.PM.1', domain: 'periods', points: 1,
+    options: [
+      { letter: 'A', text: 'The Enlightenment author would emphasize emotional and spiritual dimensions of expression; the Romantic author would prioritize reason and civic order' },
+      { letter: 'B', text: 'The Enlightenment author would ground the argument in reason, natural rights, and civic utility; the Romantic author would emphasize individual feeling and the intrinsic moral value of authentic self-expression' },
+      { letter: 'C', text: 'Both perspectives would reach identical conclusions about the proper limits of government authority' },
+      { letter: 'D', text: 'The Romantic author would reject all forms of public discourse as corrupting to the individual spirit' },
+    ],
+    correct: 'B'
+  },
+
+  {
+    id: 'q17', type: 'selected',
+    stem: 'Which of the following sentences contains an error in parallel structure?',
+    dok: 2, standard: '10.L.GC.2', domain: 'language', points: 1,
+    options: [
+      { letter: 'A', text: '"She argued convincingly, cited evidence carefully, and addressed counterarguments directly."' },
+      { letter: 'B', text: '"The author claims that speech causes harm, that regulation is necessary, and restrictions should be narrowly drawn."' },
+      { letter: 'C', text: '"To restrict speech, to monitor platforms, and to prosecute violators are all forms of government intervention."' },
+      { letter: 'D', text: '"Both the students and the faculty signed the open letter opposing the new policy."' },
+    ],
+    correct: 'B'
+  },
+
+  {
+    id: 'q18', type: 'multiselect',
+    stem: 'Select <strong>two</strong> word pairs that share similar denotative meanings but carry significantly different connotations in the context of debates about free speech.',
+    dok: 3, standard: '10.L.V.3', domain: 'language', points: 2,
+    selectCount: 2,
+    options: [
+      { letter: 'A', text: '"restriction" and "protection"' },
+      { letter: 'B', text: '"speaker" and "orator"' },
+      { letter: 'C', text: '"censor" and "regulate"' },
+      { letter: 'D', text: '"paragraph" and "passage"' },
+      { letter: 'E', text: '"silencing" and "moderating"' },
+    ],
+    correct: ['A', 'C', 'E']
+  },
+
+  {
+    id: 'q19', type: 'selected',
+    stem: 'The Greek prefix <em>demo-</em> means "people" and the root <em>-crat</em> means "rule" or "power." Based on this morphological knowledge, which of the following words from the texts would this understanding most directly help a reader decode?',
+    dok: 2, standard: '10.L.V.2', domain: 'language', points: 1,
+    options: [
+      { letter: 'A', text: 'demonstrably' },
+      { letter: 'B', text: 'democratic' },
+      { letter: 'C', text: 'demonstration' },
+      { letter: 'D', text: 'demographic' },
+    ],
+    correct: 'B'
+  },
+
+  // ── EXTENDED WRITING TASK (Q20)
+  {
+    id: 'q20', type: 'writing',
+    dok: 4, standard: '10.T.RA.1 / 10.T.SS.2', domain: 'writing', points: 8,
+    scenario: 'In your Lit & Comp II class, students are completing a research project on civil liberties and democratic participation. Your teacher introduces the unit with a discussion of free speech and its limits in modern society. You review two written texts and a video documentary presenting competing perspectives on whether speech should ever be regulated. You develop the following research question:',
+    researchQuestion: 'Should the government place limits on free speech to protect democratic participation?',
+    taskIntro: 'Consider what you have learned from Text A, Text B, and the video <em>Speech for Me, Not for Thee</em>. You will now construct an original argumentative text using your own ideas to answer the research question for the specific purpose and audience shown below.',
+    purpose: 'to argue whether the government should or should not place limits on free speech, and to support that argument with reasoning and evidence from the source materials',
+    audience: 'your Lit & Comp II classmates and teacher',
+    checklist: [
+      'I have a clearly stated claim that directly answers the research question.',
+      'I provided at least two reasons that support my claim.',
+      'I used evidence from at least two of the three sources (Text A, Text B, or the video).',
+      'I included at least one rhetorical device or appeal (logos, ethos, or pathos).',
+      'I acknowledged and rebutted the opposing viewpoint.',
+      'I used transitions to connect ideas between and within paragraphs.',
+      'I have a conclusion that restates my claim in light of the evidence presented.',
+      'I reviewed my grammar, sentence structure, and mechanics.',
+    ]
+  }
+];
+
+const DOMAIN_LABELS = {
+  techniques: 'Techniques (10.T.T)',
+  structure:  'Structure & Style (10.T.SS)',
+  context:    'Context (10.T.C)',
+  research:   'Research & Analysis (10.T.RA)',
+  language:   'Language (10.L)',
+  periods:    'Periods & Movements (10.T.PM)',
+  writing:    'Extended Writing Task'
+};
+
+const DOMAIN_MAX = {
+  techniques: 6,
+  structure:  6,
+  context:    1,
+  research:   4,
+  language:   5,
+  periods:    1
+};
+
+// ═══════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════
+function startTimer() {
+  timerInterval = setInterval(() => {
+    elapsedSeconds++;
+    const m = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+    const s = String(elapsedSeconds % 60).padStart(2, '0');
+    document.getElementById('timerDisplay').textContent = m + ':' + s;
+  }, 1000);
+}
+
+function formatElapsed(secs) {
+  const m = Math.floor(secs / 60), s = secs % 60;
+  return m + 'm ' + s + 's';
+}
+
+// ═══════════════════════════════════════
+// REGISTRATION
+// ═══════════════════════════════════════
+function startSim() {
+  const nameEl  = document.getElementById('studentName');
+  const blockEl = document.getElementById('studentBlock');
+  studentName  = nameEl.value.trim();
+  studentBlock = blockEl.value;
+  if (!studentName)  { alert('Please enter your name.'); nameEl.focus(); return; }
+  if (!studentBlock) { alert('Please select your class block.'); blockEl.focus(); return; }
+
+  const saved = localStorage.getItem('freespeech_save_' + studentName);
+  if (saved) {
+    try {
+      const state = JSON.parse(saved);
+      if (confirm('Found saved progress from a previous session. Resume where you left off?')) {
+        answers = state.answers || {};
+        vocabFlags = state.vocabFlags || {};
+        dragStates = state.dragStates || {};
+        elapsedSeconds = state.elapsed || 0;
+        writingText = state.writingText || '';
+      }
+    } catch(e) {}
+  }
+
+  document.getElementById('simStudentPill').textContent = studentName + ' · Block ' + studentBlock;
+  showScreen('screen-sim');
+  renderSimulation();
+  startTimer();
+}
+
+// ═══════════════════════════════════════
+// SCREEN MANAGEMENT
+// ═══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════
+// STEPS & RENDERING
+// ═══════════════════════════════════════
+let simSteps = [], currentStep = 0;
+
+function buildSteps() {
+  simSteps = [];
+  QUESTIONS.forEach(q => {
+    if (q.type === 'passage' || q.type === 'video') return;
+    simSteps.push(q.id);
+  });
+}
+
+// Return the left-panel source blocks for a given question id
+// All questions show all three sources: Text A, Video, Text B
+function getSourcesForQuestion(qId) {
+  const q = QUESTIONS.find(q => q.id === qId);
+  if (!q) return [];
+  // Standalone language/periods questions (Q16–Q19) have no passage reference
+  if (['q16','q17','q18','q19'].includes(qId)) return [];
+  return [
+    QUESTIONS.find(p => p.id === 'p1'),
+    QUESTIONS.find(p => p.id === 'vid1'),
+    QUESTIONS.find(p => p.id === 'p2')
+  ];
+}
+
+function renderSimulation() {
+  buildSteps();
+  renderStep(0);
+  updateProgress();
+}
+
+function renderStep(stepIdx) {
+  currentStep = stepIdx;
+  const qId = simSteps[stepIdx];
+  const q   = QUESTIONS.find(q => q.id === qId);
+  const main = document.getElementById('simMain');
+  main.className = 'sim-main';
+  main.innerHTML = '';
+
+  // LEFT PANEL
+  const leftPanel = document.createElement('div');
+  leftPanel.className = 'passage-panel';
+
+  const sources = getSourcesForQuestion(qId);
+  if (sources.length > 0) {
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'passage-panel-label';
+    labelDiv.textContent = 'SOURCE MATERIALS';
+    leftPanel.appendChild(labelDiv);
+    sources.forEach(src => {
+      if (!src) return;
+      if (src.type === 'video') {
+        leftPanel.appendChild(makeVideoBlock(src));
+      } else {
+        leftPanel.appendChild(makePassageBlock(src));
+      }
+    });
+  } else {
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'passage-panel-label';
+    labelDiv.textContent = 'LANGUAGE & LITERARY PERIODS';
+    leftPanel.appendChild(labelDiv);
+    const note = document.createElement('div');
+    note.style.cssText = 'color:var(--ink-faint);font-size:13.5px;font-style:italic;padding:20px 0;line-height:1.7;';
+    note.textContent = 'This question does not reference a specific source text. Draw on your knowledge of 10th-grade ELA standards to answer.';
+    leftPanel.appendChild(note);
+  }
+
+  // Special handling: writing task shows all 3 sources
+  if (q.type === 'writing') {
+    leftPanel.innerHTML = '';
+    const wLabel = document.createElement('div');
+    wLabel.className = 'passage-panel-label';
+    wLabel.textContent = 'SOURCE MATERIALS — Text A · Video · Text B';
+    leftPanel.appendChild(wLabel);
+    const p1 = QUESTIONS.find(p => p.id === 'p1');
+    const v1 = QUESTIONS.find(p => p.id === 'vid1');
+    const p2 = QUESTIONS.find(p => p.id === 'p2');
+    if (p1) leftPanel.appendChild(makePassageBlock(p1));
+    if (v1) leftPanel.appendChild(makeVideoBlock(v1));
+    if (p2) leftPanel.appendChild(makePassageBlock(p2));
+  }
+
+  // RIGHT PANEL
+  const rightPanel = document.createElement('div');
+  rightPanel.className = 'question-panel';
+  const inner = document.createElement('div');
+  inner.className = 'question-panel-inner';
+
+  if (q.type === 'writing') {
+    inner.appendChild(makeWritingTask(q));
+  } else {
+    inner.appendChild(makeQuestionCard(q, stepIdx + 1));
+  }
+  rightPanel.appendChild(inner);
+  rightPanel.appendChild(makeNavBar(stepIdx));
+
+  main.appendChild(leftPanel);
+  main.appendChild(rightPanel);
+  leftPanel.scrollTop = 0;
+  rightPanel.scrollTop = 0;
+  updateProgress();
+}
+
+// ─── SOURCE BLOCK BUILDERS ───────────────────────────────────
+function makePassageBlock(item) {
+  const block = document.createElement('div');
+  block.className = 'passage-block';
+  block.id = 'passage-' + item.id;
+
+  const labelHtml = item.label
+    ? `<div class="passage-label">${item.label}</div>`
+    : '';
+
+  const paragraphsHtml = (item.paragraphs || []).map((p, i) =>
+    `<div class="para-wrap">
+      <span class="para-num">${i + 1}</span>
+      <div class="para-text">${p.replace(/\n/g, '<br>')}</div>
+    </div>`
+  ).join('');
+
+  block.innerHTML = `
+    ${labelHtml}
+    <div class="passage-title">${item.title}</div>
+    <div class="passage-meta">${item.meta || ''}</div>
+    <div class="passage-body">${paragraphsHtml}</div>
+  `;
+  return block;
+}
+
+function makeVideoBlock(item) {
+  const block = document.createElement('div');
+  block.className = 'video-block';
+  block.id = 'video-' + item.id;
+  block.innerHTML = `
+    <div class="video-block-label">${item.label || 'VIDEO SOURCE'}</div>
+    <div class="video-block-title">${item.title}</div>
+    <div class="video-block-meta">${item.meta || ''}</div>
+    <div class="video-embed-wrap">
+      <iframe
+        src="${VIDEO_EMBED}"
+        allow="autoplay"
+        allowfullscreen
+        loading="lazy">
+      </iframe>
+    </div>
+    <div class="video-note">⚠ If the video does not load, make sure you are signed in to your school Google account.</div>
+  `;
+  return block;
+}
+
+// ─── QUESTION CARD ────────────────────────────────────────────
+function makeQuestionCard(item, qNum) {
+  const card = document.createElement('div');
+  card.className = 'question-card';
+  card.id = 'card-' + item.id;
+
+  const isAnswered = answers[item.id] !== undefined && (Array.isArray(answers[item.id]) ? answers[item.id].length > 0 : true);
+  const isFlagged  = vocabFlags[item.id] === true;
+  if (isAnswered) card.classList.add('answered');
+  if (isFlagged)  card.classList.add('vocab-flagged');
+
+  const typeLabel = item.type === 'selected' ? 'Selected Response' : item.type === 'multiselect' ? 'Multi-Select' : 'Drag & Drop';
+  let statusBadges = '';
+  if (isAnswered) statusBadges += `<span class="q-badge q-badge-answered">✓ Answered</span>`;
+  if (isFlagged)  statusBadges += `<span class="q-badge q-badge-vocab">🚩 Vocab Flag</span>`;
+
+  let bodyHtml = '';
+  if (item.type === 'selected')   bodyHtml = makeSelectedResponseBody(item);
+  if (item.type === 'multiselect') bodyHtml = makeMultiSelectBody(item);
+  if (item.type === 'dragdrop')    bodyHtml = makeDragDropBody(item, qNum);
+
+  card.innerHTML = `
+    <div class="question-header">
+      <div class="question-meta">
+        <span class="q-num">Question ${qNum}</span>
+        <span class="q-badge q-badge-type">${typeLabel}</span>
+        <span class="q-badge q-badge-dok">DOK ${item.dok}</span>
+        <span class="q-badge q-badge-standard">${item.standard}</span>
+        ${statusBadges}
+      </div>
+      <button class="vocab-btn ${isFlagged ? 'active' : ''}" id="vocabBtn-${item.id}" onclick="toggleVocabFlag('${item.id}')">
+        <span class="flag-icon">🚩</span> ${isFlagged ? 'Flagged' : 'Flag Vocab'}
+      </button>
+    </div>
+    <div class="question-body">
+      <div class="question-stem">${item.stem}</div>
+      ${bodyHtml}
+    </div>
+  `;
+  return card;
+}
+
+function makeSelectedResponseBody(item) {
+  return `<div class="options-list" id="opts-${item.id}">` +
+    item.options.map(opt => {
+      const sel = answers[item.id] === opt.letter ? ' selected' : '';
+      return `<div class="option-item${sel}" onclick="selectOption('${item.id}','${opt.letter}',this.closest('.options-list'))">
+        <div class="option-letter">${opt.letter}</div>
+        <div class="option-text">${opt.text}</div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function makeMultiSelectBody(item) {
+  const saved = answers[item.id] || [];
+  return `<div class="multi-select-hint">Select ${item.selectCount} answers.</div>
+  <div class="options-list" id="opts-${item.id}">` +
+    item.options.map(opt => {
+      const sel = saved.includes(opt.letter) ? ' selected' : '';
+      return `<div class="option-item multi-option${sel}" onclick="toggleMultiOption('${item.id}','${opt.letter}',${item.selectCount},this.closest('.options-list'))">
+        <div class="option-letter">${opt.letter}</div>
+        <div class="option-text">${opt.text}</div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function makeDragDropBody(item) {
+  if (!dragStates[item.id]) {
+    dragStates[item.id] = { zone1: [], zone2: item.chips.map(c => c.id) };
+  }
+  const state = dragStates[item.id];
+  const chipsMap = {};
+  item.chips.forEach(c => { chipsMap[c.id] = c.text; });
+
+  const renderChip = id =>
+    `<div class="drag-chip placed" draggable="true" id="chip-${item.id}-${id}"
+      ondragstart="onDragStart(event,'${item.id}','${id}')"
+      ontouchstart="onTouchStart(event,'${item.id}','${id}')"
+      >${chipsMap[id]}</div>`;
+
+  const z1 = state.zone1.map(renderChip).join('') || `<span class="drag-empty-hint">Drop here</span>`;
+  const z2 = state.zone2.map(renderChip).join('') || `<span class="drag-empty-hint">All placed</span>`;
+
+  return `<div class="drag-instructions">Drag each item to the correct category. Touch users: tap to select a chip, then tap the target zone.</div>
+  <div class="drag-zone-wrap">
+    <div>
+      <div class="drag-zone-label">${item.zone1Label}</div>
+      <div class="drag-zone" id="zone1-${item.id}"
+        ondragover="event.preventDefault()"
+        ondrop="onDrop(event,'${item.id}','zone1')"
+        onclick="onZoneTap('${item.id}','zone1')">${z1}</div>
+    </div>
+    <div>
+      <div class="drag-zone-label">${item.zone2Label}</div>
+      <div class="drag-zone" id="zone2-${item.id}"
+        ondragover="event.preventDefault()"
+        ondrop="onDrop(event,'${item.id}','zone2')"
+        onclick="onZoneTap('${item.id}','zone2')">${z2}</div>
+    </div>
+  </div>`;
+}
+
+// ─── WRITING TASK ─────────────────────────────────────────────
+function makeWritingTask(item) {
+  const wrapper = document.createElement('div');
+  wrapper.id = 'writing-section';
+
+  const checklistItems = item.checklist.map((c, i) =>
+    `<label class="checklist-item" id="cl-${i}">
+      <input type="checkbox" onchange="toggleChecklist(${i})"> ${c}
+    </label>`
+  ).join('');
+
+  wrapper.innerHTML = `
+    <div class="writing-section-intro">
+      <h3>Extended Writing Task · 8 Points</h3>
+      <p>You have reviewed Text A, the video, and Text B. Now construct an original argumentative essay. Use the Writer's Checklist before submitting.</p>
+    </div>
+    <div class="writing-scenario-block">
+      <div class="scenario-label">Scenario</div>
+      <p>${item.scenario}</p>
+      <p class="research-q">${item.researchQuestion}</p>
+      <p>You have reviewed three sources on the topic of free speech and its limits. Be sure to provide reasons for your claim, support your reasons with evidence from the sources, and include rhetorical devices and/or appeals to make the argument more compelling. Refer to the Writer's Checklist as you type and edit your response.</p>
+    </div>
+    <div class="writing-task-box">
+      <div class="task-label">Writing Task</div>
+      <h3>${item.researchQuestion}</h3>
+      <p>${item.taskIntro}</p>
+      <div class="task-purpose">
+        <p><strong>Purpose:</strong> ${item.purpose}</p>
+        <p><strong>Audience:</strong> ${item.audience}</p>
+      </div>
+    </div>
+    <div class="writing-checklist">
+      <h4>Writer's Checklist</h4>
+      <div class="checklist-items">${checklistItems}</div>
+    </div>
+    <div class="writing-editor">
+      <div class="editor-toolbar">
+        <button class="editor-toolbar-btn" onclick="document.execCommand('undo')">↩ Undo</button>
+        <button class="editor-toolbar-btn" onclick="document.execCommand('redo')">↪ Redo</button>
+        <div class="editor-toolbar-sep"></div>
+        <button class="editor-toolbar-btn" onclick="document.execCommand('bold')"><strong>B</strong></button>
+        <button class="editor-toolbar-btn" onclick="document.execCommand('italic')"><em>I</em></button>
+      </div>
+      <textarea class="writing-textarea" id="writingTextarea"
+        placeholder="Begin writing here. Your response should be a multi-paragraph argumentative essay. Use evidence from at least two of the three sources."
+        oninput="updateWordCount(this)">${writingText}</textarea>
+      <div class="word-count-bar">
+        <span class="word-count-label" id="wordCountLabel">0 words</span>
+        <span class="word-count-hint">Aim for 300–500 words for a complete response</span>
+      </div>
+    </div>
+  `;
+  return wrapper;
+}
+
+// ─── NAV BAR ──────────────────────────────────────────────────
+function makeNavBar(stepIdx) {
+  const total = simSteps.length;
+  const isLast = stepIdx === total - 1;
+  const bar = document.createElement('div');
+  bar.className = 'qnav-bar';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'qnav-btn';
+  prevBtn.innerHTML = '← Previous';
+  prevBtn.disabled = stepIdx === 0;
+  prevBtn.onclick = () => renderStep(stepIdx - 1);
+
+  const dots = document.createElement('div');
+  dots.className = 'qnav-dots';
+  simSteps.forEach((id, i) => {
+    const q = QUESTIONS.find(q => q.id === id);
+    const dot = document.createElement('div');
+    dot.className = 'qnav-dot';
+    if (q.type === 'writing') dot.classList.add('writing-dot');
+    if (i === stepIdx) dot.classList.add('current');
+    const ans = answers[id];
+    if (ans !== undefined && (Array.isArray(ans) ? ans.length > 0 : true)) dot.classList.add('answered');
+    if (vocabFlags[id]) dot.classList.add('flagged');
+    dot.title = q.type === 'writing' ? 'Extended Writing' : `Question ${i + 1}`;
+    dot.onclick = () => renderStep(i);
+    dots.appendChild(dot);
+  });
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'qnav-btn primary';
+  nextBtn.id = 'submitBtn';
+  if (isLast) {
+    nextBtn.innerHTML = 'Submit Simulation →';
+    nextBtn.onclick = () => submitSimulation();
+  } else {
+    nextBtn.innerHTML = 'Next →';
+    nextBtn.id = '';
+    nextBtn.onclick = () => renderStep(stepIdx + 1);
+  }
+
+  bar.appendChild(prevBtn);
+  bar.appendChild(dots);
+  bar.appendChild(nextBtn);
+  return bar;
+}
+
+// ═══════════════════════════════════════
+// ANSWER INTERACTIONS
+// ═══════════════════════════════════════
+function selectOption(qId, letter, container) {
+  container.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  answers[qId] = letter;
+  updateCardStatus(qId);
+  updateProgress();
+}
+
+function toggleMultiOption(qId, letter, maxSelect, container) {
+  const el = event.currentTarget;
+  const current = answers[qId] || [];
+  if (el.classList.contains('selected')) {
+    el.classList.remove('selected');
+    answers[qId] = current.filter(l => l !== letter);
+  } else {
+    if (current.length >= maxSelect) {
+      const firstSel = container.querySelector('.option-item.selected');
+      if (firstSel) {
+        firstSel.classList.remove('selected');
+        const oldL = firstSel.querySelector('.option-letter').textContent;
+        answers[qId] = current.filter(l => l !== oldL);
+      }
+    }
+    el.classList.add('selected');
+    answers[qId] = [...(answers[qId] || []), letter];
+  }
+  updateCardStatus(qId);
+  updateProgress();
+}
+
+function toggleVocabFlag(qId) {
+  vocabFlags[qId] = !vocabFlags[qId];
+  const card = document.getElementById('card-' + qId);
+  const btn  = document.getElementById('vocabBtn-' + qId);
+  if (vocabFlags[qId]) {
+    card.classList.add('vocab-flagged');
+    btn.classList.add('active');
+    btn.innerHTML = '<span class="flag-icon">🚩</span> Flagged';
+  } else {
+    card.classList.remove('vocab-flagged');
+    btn.classList.remove('active');
+    btn.innerHTML = '<span class="flag-icon">🚩</span> Flag Vocab';
+  }
+  updateCardStatus(qId);
+}
+
+function updateCardStatus(qId) {
+  const card = document.getElementById('card-' + qId);
+  if (!card) return;
+  const isAnswered = answers[qId] !== undefined && (Array.isArray(answers[qId]) ? answers[qId].length > 0 : true);
+  const isFlagged  = vocabFlags[qId] === true;
+  card.classList.toggle('answered', isAnswered);
+  card.classList.toggle('vocab-flagged', isFlagged);
+  const meta = card.querySelector('.question-meta');
+  if (meta) {
+    meta.querySelectorAll('.q-badge-answered, .q-badge-vocab').forEach(b => b.remove());
+    if (isAnswered) meta.insertAdjacentHTML('beforeend', '<span class="q-badge q-badge-answered">✓ Answered</span>');
+    if (isFlagged)  meta.insertAdjacentHTML('beforeend', '<span class="q-badge q-badge-vocab">🚩 Vocab Flag</span>');
+  }
+  updateNavDots();
+}
+
+function updateProgress() {
+  const totalQ  = QUESTIONS.filter(q => q.type !== 'passage' && q.type !== 'video' && q.type !== 'writing').length;
+  const answered = Object.keys(answers).filter(k => {
+    const q = QUESTIONS.find(q => q.id === k);
+    return q && q.type !== 'writing';
+  }).filter(k => {
+    const v = answers[k];
+    return v !== undefined && (Array.isArray(v) ? v.length > 0 : true);
+  }).length;
+  const pct = Math.round((answered / totalQ) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = answered + ' / ' + totalQ + ' answered';
+  updateNavDots();
+}
+
+function updateNavDots() {
+  document.querySelectorAll('.qnav-dot').forEach((dot, i) => {
+    if (i >= simSteps.length) return;
+    const id = simSteps[i];
+    const q  = QUESTIONS.find(q => q.id === id);
+    dot.className = 'qnav-dot';
+    if (q && q.type === 'writing') dot.classList.add('writing-dot');
+    if (i === currentStep) dot.classList.add('current');
+    const ans = answers[id];
+    if (ans !== undefined && (Array.isArray(ans) ? ans.length > 0 : true)) dot.classList.add('answered');
+    if (vocabFlags[id]) dot.classList.add('flagged');
+  });
+}
+
+function toggleChecklist(idx) {
+  const label = document.getElementById('cl-' + idx);
+  if (label) label.classList.toggle('checked', label.querySelector('input').checked);
+}
+
+function updateWordCount(textarea) {
+  writingText = textarea.value;
+  const words = textarea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+  document.getElementById('wordCountLabel').textContent = words + ' word' + (words !== 1 ? 's' : '');
+}
+
+// ═══════════════════════════════════════
+// DRAG AND DROP
+// ═══════════════════════════════════════
+let touchDragChip = null, touchDragQId = null;
+
+function onDragStart(event, qId, chipId) {
+  event.dataTransfer.setData('text/plain', chipId + '|' + qId);
+  document.getElementById('chip-' + qId + '-' + chipId).classList.add('dragging');
+}
+
+function onTouchStart(event, qId, chipId) {
+  touchDragChip = chipId; touchDragQId = qId;
+  document.querySelectorAll('.drag-chip').forEach(c => c.style.outline = '');
+  const el = document.getElementById('chip-' + qId + '-' + chipId);
+  if (el) el.style.outline = '2px solid var(--blue)';
+}
+
+function onZoneTap(qId, zone) {
+  if (touchDragChip && touchDragQId === qId) {
+    moveChip(qId, touchDragChip, zone);
+    document.querySelectorAll('.drag-chip').forEach(c => c.style.outline = '');
+    touchDragChip = null; touchDragQId = null;
+  }
+}
+
+function onDrop(event, qId, zone) {
+  event.preventDefault();
+  const data = event.dataTransfer.getData('text/plain').split('|');
+  if (data[1] === qId) moveChip(qId, data[0], zone);
+}
+
+function moveChip(qId, chipId, targetZone) {
+  const state = dragStates[qId];
+  const q = QUESTIONS.find(q => q.id === qId);
+  if (!state || !q) return;
+  state.zone1 = state.zone1.filter(id => id !== chipId);
+  state.zone2 = state.zone2.filter(id => id !== chipId);
+  if (targetZone === 'zone1') state.zone1.push(chipId);
+  else state.zone2.push(chipId);
+  if (state.zone1.length > 0 || state.zone2.length > 0) {
+    answers[qId] = { zone1: [...state.zone1], zone2: [...state.zone2] };
+  }
+  const card = document.getElementById('card-' + qId);
+  if (card) {
+    const body = card.querySelector('.question-body');
+    const stemEl = body.querySelector('.question-stem');
+    body.innerHTML = (stemEl ? stemEl.outerHTML : '') + makeDragDropBody(q);
+  }
+  updateCardStatus(qId);
+  updateProgress();
+}
+
+// ═══════════════════════════════════════
+// SAVE PROGRESS
+// ═══════════════════════════════════════
+function saveProgress() {
+  writingText = document.getElementById('writingTextarea')?.value || writingText;
+  localStorage.setItem('freespeech_save_' + studentName, JSON.stringify({
+    studentName, studentBlock, answers, vocabFlags, dragStates,
+    elapsed: elapsedSeconds, writingText, savedAt: new Date().toISOString()
+  }));
+  showSaveBanner('Progress saved! Resume anytime before submitting.');
+}
+
+function showSaveBanner(msg) {
+  const banner = document.getElementById('saveBanner');
+  document.getElementById('saveBannerMsg').textContent = msg;
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 3500);
+}
+
+// ═══════════════════════════════════════
+// SCORING
+// ═══════════════════════════════════════
+function scoreAnswers() {
+  let totalCorrect = 0;
+  const domainScores = { techniques: 0, structure: 0, context: 0, research: 0, language: 0, periods: 0 };
+
+  QUESTIONS.forEach(q => {
+    if (q.type === 'passage' || q.type === 'video' || q.type === 'writing') return;
+
+    if (q.type === 'selected') {
+      if (answers[q.id] === q.correct) {
+        totalCorrect++;
+        if (domainScores[q.domain] !== undefined) domainScores[q.domain]++;
+      }
+    } else if (q.type === 'multiselect') {
+      const userAns = answers[q.id] || [];
+      const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
+      const earned  = Math.min(userAns.filter(a => correct.includes(a)).length, q.points);
+      totalCorrect += earned;
+      if (domainScores[q.domain] !== undefined) domainScores[q.domain] += earned;
+    } else if (q.type === 'dragdrop') {
+      const state = dragStates[q.id];
+      if (!state) return;
+      const z1c = (q.correctZone1 || []).filter(id => state.zone1.includes(id)).length;
+      const z2c = (q.correctZone2 || []).filter(id => state.zone2.includes(id)).length;
+      const tot = (q.correctZone1 || []).length + (q.correctZone2 || []).length;
+      const earned = tot > 0 ? Math.round((z1c + z2c) / tot * q.points) : 0;
+      totalCorrect += earned;
+      if (domainScores[q.domain] !== undefined) domainScores[q.domain] += earned;
+    }
+  });
+
+  return { totalCorrect, domainScores };
+}
+
+function getAchievementLevel(score, total) {
+  const pct = score / total;
+  if (pct >= 0.85) return { label: 'Distinguished Learner', cls: 'ach-distinguished' };
+  if (pct >= 0.65) return { label: 'Proficient Learner',    cls: 'ach-proficient' };
+  if (pct >= 0.40) return { label: 'Developing Learner',    cls: 'ach-developing' };
+  return { label: 'Beginning Learner', cls: 'ach-beginning' };
+}
+
+// ═══════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════
+async function submitSimulation() {
+  writingText = document.getElementById('writingTextarea')?.value || writingText;
+  document.querySelectorAll('#submitBtn').forEach(btn => btn.disabled = true);
+  clearInterval(timerInterval);
+
+  showLoading('Submitting your simulation...', 'Please wait while we score your responses and generate AI writing feedback. This may take 30–60 seconds.');
+
+  const { totalCorrect, domainScores } = scoreAnswers();
+  const srTotal = 19;
+
+  const flaggedItems = Object.entries(vocabFlags)
+    .filter(([, v]) => v)
+    .map(([k]) => {
+      const idx = QUESTIONS.filter(q => q.type !== 'passage' && q.type !== 'video' && q.type !== 'writing').findIndex(q => q.id === k);
+      return idx >= 0 ? `Q${idx + 1}` : k;
+    }).join(', ');
+
+  let writingFeedback = { overall: '', strengths: '', nextSteps: '', teacherSummary: '', trait1: 0, trait2: 0, trait3: 0 };
+  try {
+    writingFeedback = await getAIWritingFeedback(writingText, totalCorrect, flaggedItems);
+  } catch(e) {
+    writingFeedback.overall = 'AI feedback unavailable. Please try again later.';
+  }
+
+  const writingScore = writingFeedback.trait1 + writingFeedback.trait2 + writingFeedback.trait3;
+  const grandTotal   = totalCorrect + writingScore;
+  const grandMax     = srTotal + 8;
+  const ach          = getAchievementLevel(grandTotal, grandMax);
+
+  const payload = {
+    studentName,
+    block:                  studentBlock,
+    overallScore:           grandTotal + '/' + grandMax,
+    correctItems:           totalCorrect,
+    totalItems:             srTotal,
+    achievementLevel:       ach.label,
+    techniquesScore:        domainScores.techniques + '/' + DOMAIN_MAX.techniques,
+    structureStyleScore:    domainScores.structure  + '/' + DOMAIN_MAX.structure,
+    contextScore:           domainScores.context    + '/' + DOMAIN_MAX.context,
+    researchAnalysisScore:  domainScores.research   + '/' + DOMAIN_MAX.research,
+    languageScore:          domainScores.language   + '/' + DOMAIN_MAX.language,
+    periodsScore:           domainScores.periods    + '/' + DOMAIN_MAX.periods,
+    vocabularyFlags:        flaggedItems || 'None',
+    essayText:              writingText  || '[No response submitted]',
+    overallFeedback:        writingFeedback.overall,
+    strengths:              writingFeedback.strengths,
+    nextSteps:              writingFeedback.nextSteps,
+    teacherSummary:         writingFeedback.teacherSummary,
+    trait1Score:            writingFeedback.trait1,
+    trait2Score:            writingFeedback.trait2,
+    trait3Score:            writingFeedback.trait3,
+    timeElapsed:            formatElapsed(elapsedSeconds)
+  };
+
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) { console.warn('Sheets error:', e); }
+
+  hideLoading();
+  localStorage.removeItem('freespeech_save_' + studentName);
+  showResults({ totalCorrect, domainScores, ach, writingFeedback, writingScore, grandTotal, grandMax, flaggedItems, srTotal });
+}
+
+// ═══════════════════════════════════════
+// AI WRITING FEEDBACK
+// ═══════════════════════════════════════
+async function getAIWritingFeedback(essay, srScore, flaggedItems) {
+  const systemPrompt = `You are an expert Georgia Milestones ELA rater for Literature & Composition II (10th grade). You evaluate student extended writing responses using the official 8-point, 3-trait rubric:
+
+TRAIT 1 — Purpose & Organization (0-3 points):
+3: Coherent, purposeful, clearly stated claim, cohesive structure, appropriate style and tone
+2: Reasonably coherent, adequate structure, mostly appropriate style
+1: Incomplete, weak organization, inconsistent style
+0: Disorganized, no discernible purpose
+
+TRAIT 2 — Evidence & Elaboration (0-3 points):
+3: Thorough, relevant evidence from sources, effective elaboration, precise word choice
+2: Adequate evidence, some elaboration, generally precise word choice
+1: Minimal evidence, limited elaboration, imprecise word choice
+0: No evidence or elaboration
+
+TRAIT 3 — Language Usage & Conventions (0-2 points):
+2: Varied syntax, mostly correct verb tense/mood, parallel structure, few errors
+1: Some syntax variety, some errors, partial command
+0: Little or no command of conventions, frequent errors
+
+The student is a 10th grader (Grade 10, Lit & Comp II). Calibrate accordingly.
+Return ONLY valid JSON — no markdown, no preamble, no explanation outside the JSON object.`;
+
+  const userPrompt = `Score this 10th-grade argumentative essay in response to: "Should the government place limits on free speech to protect democratic participation?"
+
+ESSAY:
+${essay || '[No response provided]'}
+
+Student context: Selected-response score was ${srScore}/19. Vocabulary barriers flagged on: ${flaggedItems || 'none'}.
+
+Return this exact JSON:
+{
+  "trait1Score": <0-3>,
+  "trait2Score": <0-3>,
+  "trait3Score": <0-2>,
+  "overallFeedback": "<2-3 sentence overall assessment at 10th grade Lit & Comp II level>",
+  "strengths": "<2-3 specific, evidence-based strengths from the essay itself>",
+  "nextSteps": "<2-3 specific, actionable improvements tied to the rubric — name the trait and what to do>",
+  "teacherSummary": "<1-2 sentence teacher-facing summary: achievement level context, what to target instructionally, whether vocabulary barriers may be a factor>"
+}`;
+
+  const response = await fetch(WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+
+  if (!response.ok) throw new Error('API error ' + response.status);
+  const data = await response.json();
+  const raw  = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+  const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+
+  return {
+    trait1: parseInt(parsed.trait1Score) || 0,
+    trait2: parseInt(parsed.trait2Score) || 0,
+    trait3: parseInt(parsed.trait3Score) || 0,
+    overall:        parsed.overallFeedback || '',
+    strengths:      parsed.strengths       || '',
+    nextSteps:      parsed.nextSteps       || '',
+    teacherSummary: parsed.teacherSummary  || ''
+  };
+}
+
+// ═══════════════════════════════════════
+// SHOW RESULTS
+// ═══════════════════════════════════════
+function showResults({ totalCorrect, domainScores, ach, writingFeedback, writingScore, grandTotal, grandMax, flaggedItems, srTotal }) {
+  showScreen('screen-results');
+
+  document.getElementById('resultsStudentLine').textContent =
+    studentName + ' · Block ' + studentBlock + ' · Submitted ' + new Date().toLocaleString();
+
+  document.getElementById('heroScore').textContent  = grandTotal;
+  document.getElementById('heroDenom').textContent  = '/ ' + grandMax;
+
+  const achBadge = document.getElementById('achievementBadge');
+  achBadge.textContent = ach.label;
+  achBadge.className   = 'achievement-badge ' + ach.cls;
+
+  const achDescs = {
+    'Distinguished Learner': 'Exceptional performance. Demonstrates mastery of Lit & Comp II standards at a level that exceeds grade-level expectations.',
+    'Proficient Learner':    'Meets grade-level expectations for Lit & Comp II. Demonstrates solid command of key standards.',
+    'Developing Learner':    'Approaching proficiency. Shows partial understanding of key standards with consistent areas for growth.',
+    'Beginning Learner':     'Below grade-level expectations. Significant gaps in core Lit & Comp II standards need targeted instructional support.'
+  };
+  document.getElementById('achievementDesc').textContent = achDescs[ach.label] || '';
+
+  // Domain breakdown
+  const domDiv = document.getElementById('domainBreakdown');
+  const domains = ['techniques','structure','context','research','language','periods'];
+  domDiv.innerHTML = domains.map(d => {
+    const earned = domainScores[d] || 0;
+    const max    = DOMAIN_MAX[d];
+    const pct    = Math.round((earned / max) * 100);
+    return `<div class="domain-row">
+      <div class="domain-name">${DOMAIN_LABELS[d].split('(')[0].trim()}</div>
+      <div class="domain-bar-wrap"><div class="domain-bar-fill" style="width:${pct}%"></div></div>
+      <div class="domain-score-label">${earned}/${max}</div>
+    </div>`;
+  }).join('');
+
+  // Trait scores
+  document.getElementById('trait1Score').textContent = writingFeedback.trait1;
+  document.getElementById('trait2Score').textContent = writingFeedback.trait2;
+  document.getElementById('trait3Score').textContent = writingFeedback.trait3;
+
+  // Quick stats
+  document.getElementById('quickStats').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid var(--cream-border);">
+        <span style="color:var(--ink-soft)">Selected Response Score</span><strong>${totalCorrect} / ${srTotal}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid var(--cream-border);">
+        <span style="color:var(--ink-soft)">Extended Writing Score</span><strong>${writingScore} / 8</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid var(--cream-border);">
+        <span style="color:var(--ink-soft)">Total Score</span><strong>${grandTotal} / ${grandMax}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0;">
+        <span style="color:var(--ink-soft)">Time Elapsed</span><strong>${formatElapsed(elapsedSeconds)}</strong>
+      </div>
+    </div>`;
+
+  // Vocab flags
+  const allQs = QUESTIONS.filter(q => q.type !== 'passage' && q.type !== 'video' && q.type !== 'writing');
+  const flaggedList = allQs
+    .filter(q => vocabFlags[q.id])
+    .map(q => {
+      const qNum = allQs.findIndex(i => i.id === q.id) + 1;
+      return `<div class="vocab-flag-row"><span class="flag-icon">🚩</span> Question ${qNum} · ${q.standard}</div>`;
+    });
+
+  document.getElementById('vocabFlagsSummary').innerHTML = flaggedList.length
+    ? `<div class="vocab-flags-list">${flaggedList.join('')}</div>`
+    : `<div class="no-flags">No vocabulary barriers flagged.</div>`;
+
+  renderAIFeedback(writingFeedback);
+
+  document.getElementById('submissionConfirm').innerHTML =
+    `<div class="submission-confirm">✓ Results submitted to your teacher's Google Sheet.</div>`;
+}
+
+function renderAIFeedback(fb) {
+  const area = document.getElementById('aiFeedbackArea');
+  if (!fb || !fb.overall) {
+    area.innerHTML = '<p style="color:var(--ink-faint);font-style:italic;font-size:13px;">AI feedback unavailable for this submission.</p>';
+    return;
+  }
+  area.innerHTML = `
+    <div class="trait-scores-row" style="margin-bottom:20px;">
+      <div class="trait-score-box"><div class="trait-num">${fb.trait1}</div><div class="trait-denom">/3</div><div class="trait-label">Purpose & Org.</div></div>
+      <div class="trait-score-box"><div class="trait-num">${fb.trait2}</div><div class="trait-denom">/3</div><div class="trait-label">Evidence & Elab.</div></div>
+      <div class="trait-score-box"><div class="trait-num">${fb.trait3}</div><div class="trait-denom">/2</div><div class="trait-label">Lang. & Conventions</div></div>
+    </div>
+    ${fb.overall    ? `<div class="feedback-section"><div class="feedback-section-label overall">Overall Assessment</div><div class="feedback-text">${fb.overall}</div></div>` : ''}
+    ${fb.strengths  ? `<div class="feedback-section"><div class="feedback-section-label strengths">Strengths</div><div class="feedback-text">${fb.strengths}</div></div>` : ''}
+    ${fb.nextSteps  ? `<div class="feedback-section"><div class="feedback-section-label next-steps">Next Steps</div><div class="feedback-text">${fb.nextSteps}</div></div>` : ''}
+    ${fb.teacherSummary ? `<div class="feedback-section"><div class="feedback-section-label teacher">Teacher Summary</div><div class="feedback-text" style="background:var(--vocab-soft);border-left:3px solid var(--vocab-flag);padding-left:16px;">${fb.teacherSummary}</div></div>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════
+// LOADING
+// ═══════════════════════════════════════
+function showLoading(title, msg) {
+  document.getElementById('loadingTitle').textContent = title;
+  document.getElementById('loadingMsg').textContent   = msg;
+  document.getElementById('loadingOverlay').classList.add('active');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+window.addEventListener('beforeunload', () => {
+  if (document.getElementById('screen-sim').classList.contains('active')) saveProgress();
+});
+</script>
+</body>
+</html>
