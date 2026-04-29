@@ -1362,18 +1362,21 @@ function scoreAnswers() {
         if (domainScores[q.domain] !== undefined) domainScores[q.domain]++;
       }
     } else if (q.type === 'multiselect') {
+      // Each question worth exactly 1 point toward the 19-item total
       const userAns = answers[q.id] || [];
       const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
-      const earned  = Math.min(userAns.filter(a => correct.includes(a)).length, q.points);
+      const hits = userAns.filter(a => correct.includes(a)).length;
+      const earned = hits >= Math.ceil(correct.length / 2) ? 1 : 0;
       totalCorrect += earned;
       if (domainScores[q.domain] !== undefined) domainScores[q.domain] += earned;
     } else if (q.type === 'dragdrop') {
+      // Each question worth exactly 1 point toward the 19-item total
       const state = dragStates[q.id];
       if (!state) return;
       const z1c = (q.correctZone1 || []).filter(id => state.zone1.includes(id)).length;
       const z2c = (q.correctZone2 || []).filter(id => state.zone2.includes(id)).length;
       const tot = (q.correctZone1 || []).length + (q.correctZone2 || []).length;
-      const earned = tot > 0 ? Math.round((z1c + z2c) / tot * q.points) : 0;
+      const earned = (tot > 0 && (z1c + z2c) / tot >= 0.5) ? 1 : 0;
       totalCorrect += earned;
       if (domainScores[q.domain] !== undefined) domainScores[q.domain] += earned;
     }
